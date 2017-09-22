@@ -14,8 +14,8 @@ then
 elif [ $OSVERSION -eq 7 ]
 then
         #echo -e "OS Version: $(cat /etc/redhat-release) \n script exit..."
-        #LOCALIP=`ifconfig | grep inet | grep -Ev "inet6|127.0.0.1" | sed 's/^.*inet \(.*\)  ne.*$/\1/g' |grep -E "^192.168.*|10.*|172.16.*"| tail -1`
-        exit
+        LOCALIP=`ifconfig | grep inet | grep -Ev "inet6|127.0.0.1" | sed 's/^.*inet \(.*\)  ne.*$/\1/g' |grep -E "^192.168.*|10.*|172.16.*"| tail -1`
+        #exit
 fi
 
 adduser(){
