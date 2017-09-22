@@ -1,8 +1,8 @@
 #!/bin/bash
 # author:baiyongjie
 # date:2017/09/21
-# useradd xianhuahua
-# passwd xianhuahua
+# useradd 
+# passwd 
 # change user longin
 # change ssh port
 
