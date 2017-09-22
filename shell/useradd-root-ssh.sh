@@ -34,18 +34,33 @@ fi
 echo "$username:$password" | chpasswd
 if [ $? -eq 0 ]
 then
-    echo "user sudo add  successfully !"
-else
-    echo "user sudo add  failly !"
-    exit
-fi
-sed -i  "99i $username   ALL=(ALL)   ALL" /etc/sudoers
-if [ $? -eq 0 ]
-then
     echo "user passwd add  successfully !"
 else
     echo "user passwd add  failly !"
     exit
+fi
+sudoline=$(cat -A /etc/sudoers | grep -n ^root | cut  -d ":"  -f 1)
+a=a
+if [ $OSVERSION -eq 6  ]
+then
+    sed -i  "$sudoline$a $username   ALL=(ALL)   ALL" /etc/sudoers
+    if [ $? -eq 0  ]
+    then
+        echo "user sudo add  successfully !"
+    else
+        echo "user sudo add  failly !"
+        exit
+    fi
+elif [ $OSVERSION -eq 7 ]
+then
+    sed -i  "$sudoline$a $username   ALL=(ALL)   ALL" /etc/sudoers
+    if [ $? -eq 0   ]
+    then
+        echo "user sudo add  successfully !"
+    else
+       echo "user sudo add  failly !"
+       exit
+    fi
 fi
 echo -e "\n"
 echo "pwd file: pwd-$LOCALIP-info.txt"
@@ -103,7 +118,7 @@ then
 fi
 }
 
-changeport=8848
+changeport=8868
 changesshport(){
 grep "#Port 22"  /etc/ssh/sshd_config  &> /dev/null
 if [ $? -eq 0 ]
