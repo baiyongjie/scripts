@@ -1,6 +1,5 @@
 #!/bin/bash
 
-###owned by Winchannel ITS ####
 ###version 1.0 2018-02-24 created by Baiyongjie ####
 ###Monitoring Tcp Access Send Email. ####
 

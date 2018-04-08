@@ -1,6 +1,5 @@
 #!/bin/bash
 
-###owned by Winchannel ITS ####
 ###version 1.0 2018-02-24 created by Baiyongjie ####
 ###Monitoring Tomcat Ps Old & auto restart Tomcat ####
 
@@ -76,23 +75,23 @@ do
                 #echo -e "\033[40;36mtomcat-pid:$tomcat_pid   tomcat-path:$tomcat_path  \njdk-path:$java_home   jdk-version:$java_version\033[0m"
                 #echo -e "\033[40;32mPS Old Generation: $PS_Old\033[0m"
                 mkdir -p $dump_path &> /dev/null
-                echo -e "----Now time: `date +%Y-%m-%d-%H:%M`----\n"  >>  wincITS_tomcat-autodump.log
-                echo "Server Name:$server_name" >> wincITS_tomcat-autodump.log
-                echo -e "PS Old Generation: $PS_Old\nTomcat Path: $tomcat_path\nTomcat Port:\n"  >>  wincITS_tomcat-autodump.log 
-                netstat -nplt | grep $tomcat_pid   >>  wincITS_tomcat-autodump.log
-                echo -e "\ndump $tomcat_path start .. " >>  wincITS_tomcat-autodump.log
+                echo -e "----Now time: `date +%Y-%m-%d-%H:%M`----\n"  >>  tomcat-autodump.log
+                echo "Server Name:$server_name" >> tomcat-autodump.log
+                echo -e "PS Old Generation: $PS_Old\nTomcat Path: $tomcat_path\nTomcat Port:\n"  >>  tomcat-autodump.log 
+                netstat -nplt | grep $tomcat_pid   >>  tomcat-autodump.log
+                echo -e "\ndump $tomcat_path start .. " >>  tomcat-autodump.log
                 $java_home/bin/jmap -heap  $tomcat_pid &> $dump_path/jmap_heap_$tomcat_pid.txt        
                 $java_home/bin/jmap -histo $tomcat_pid &> $dump_path/jmap_histo_$tomcat_pid.txt
                 $java_home/bin/jmap -dump:format=b,file=$dump_path/jmap_dump_$tomcat_pid.dump $tomcat_pid
                 $java_home/bin/jstack -F  $tomcat_pid &> $dump_path/jstack_F_$tomcat_pid.txt
                 $java_home/bin/jstack -l $tomcat_pid &> $dump_path/jstack_l_$tomcat_pid.txt
-                echo -e "$dump_path/jmap_heap_$tomcat_pid.txt\n$dump_path/jmap_histo_$tomcat_pid.txt\n$dump_path/jmap_dump_$tomcat_pid.dump\n$dump_path/jstack_F_$tomcat_pid.txt\n$dump_path/jstack_l_$tomcat_pid.txt"  >> wincITS_tomcat-autodump.log
+                echo -e "$dump_path/jmap_heap_$tomcat_pid.txt\n$dump_path/jmap_histo_$tomcat_pid.txt\n$dump_path/jmap_dump_$tomcat_pid.dump\n$dump_path/jstack_F_$tomcat_pid.txt\n$dump_path/jstack_l_$tomcat_pid.txt"  >> tomcat-autodump.log
                 kill -9 $tomcat_pid 
                 sleep 3
                 $tomcat_path/bin/startup.sh &> /dev/null
-                echo -e "$tomcat_path  Restart...\n"  >>  wincITS_tomcat-autodump.log
+                echo -e "$tomcat_path  Restart...\n"  >>  tomcat-autodump.log
                 #send email
-                tail -19 wincITS_tomcat-autodump.log  | mail  -s "$tomcat_path Ps-Old-Dump && Restart!" baiyongjie@winchannel.net
+                tail -19 tomcat-autodump.log  | mail  -s "$tomcat_path Ps-Old-Dump && Restart!"  misterbyj@163.com
                 cd $dump_path
                 tar -zcf dumpfile-$(date "+%Y-%m-%d")-$tomcat_pid.tar.gz  jmap_heap_$tomcat_pid.txt jmap_histo_$tomcat_pid.txt jmap_dump_$tomcat_pid.dump jstack_F_$tomcat_pid.txt jstack_l_$tomcat_pid.txt  --remove-files
             fi
