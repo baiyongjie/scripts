@@ -64,5 +64,3 @@ done
 
 #删除7天以前的备份文件
 find $bakcupPath -mtime +7 -type f -name "*.tar.gz" | xargs rm -rf 
-
-
