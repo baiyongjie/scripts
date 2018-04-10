@@ -1,0 +1,15 @@
+
+
+The following tomcat is Access Failure !!!
+
+#############################################
+http://google.com      #google  ---Access Failure
+#############################################
+
+
+The following tomcat is Accessible.
+
+#############################################
+http://www.baidu.com   #baidu  +++Access Successful
+#############################################
+
