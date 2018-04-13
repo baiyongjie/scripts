@@ -1,5 +1,6 @@
 #!/bin/bash
 ###############################
+###owned by Winchannel ITS ####
 ###version 1.2 2018-03-05  ####
 ###created by Baiyongjie   ####
 ###############################
@@ -12,18 +13,16 @@
 
 #++++++++++++++++++++++++#
 ###version 1.3###
-#Add docker option
+#modified menu function
+#modified jv_ps_old  function
+#modified dump function
+#Add kill 
+#Add docker function 
 #++++++++++++++++++++++++#
 
 menu(){
-echo -e "
-Now user:$(who | awk '{print $1}'|tail -1)
-Now the time:$(date "+%Y-%m-%d-%T")
-==========================
-Menu:
-==========================
-  \033[32mj:java / tc:t_config / p:t_port / jv:jvm_ps_old /d:t_dump / tr:t_restart / tf:t_tlog / ngx:nginx
-  o:vi / oo:vim / ds:OS_status / n:netstat/ c:/bin/bash / l:clear / y:yum repo / dk:docker /q:exit\033[0m
+echo -e "\033[32m\nj:java / tc:t_config / p:t_port / jv:jvm_ps_old /d:t_dump / k:kill /tr:t_restart / tf:t_tlog / ngx:nginx
+o:vi / oo:vim / ds:OS_status / n:netstat/ c:/bin/bash / l:clear / y:yum repo / dk:docker /q:exit\033[0m
 =========================="
 }
 
@@ -51,23 +50,22 @@ then
     exit
 fi
 
+
 #catalina.sh
 echo -e "\033[36m$TOMCAT_PATH/bin/catalina.sh\033[0m"
-echo -e "\033[32m----  Catalina  config  begin----\033[0m"
 grep -E "^JAVA_HOME=|^export JAVA_HOME="   $TOMCAT_PATH/bin/catalina.sh
 grep  "^JAVA_OPTS="   $TOMCAT_PATH/bin/catalina.sh
 grep  "^CATALINA_OPTS=" $TOMCAT_PATH/bin/catalina.sh
-echo -e "\033[32m----  Catalina  config  end-----\033[0m\n"
+echo -e "\n"
 
 #server.xml
 echo -e "\033[36m$TOMCAT_PATH/conf/server.xml\033[0m"
-echo -e "\033[32m----  server.xml  config  begin----\033[0m"
 grep "shutdown=" "$TOMCAT_PATH/conf/server.xml"
 grep "Connector executor=" "$TOMCAT_PATH/conf/server.xml"
 grep "Connector port=" "$TOMCAT_PATH/conf/server.xml"
 grep "appBase" "$TOMCAT_PATH/conf/server.xml" 
 grep "docBase" "$TOMCAT_PATH/conf/server.xml"
-echo -e "\033[32m----  server.xml  config  end-----\033[0m\n"
+echo -e "\n"
 
 #find the root path
 #root_path
@@ -88,19 +86,21 @@ then
     fi
 else
     appbase=$(grep "appBase" "$TOMCAT_PATH/conf/server.xml" | awk -F= '{print $3}'|awk -F\" '{print $2}')
-    if [ "$appbase" = "webapps" ]
+    if [ $appbase = "webapps" ]
     then
         root_path=$TOMCAT_PATH/$appbase 
+    else
+        root_path=$appbase
     fi
 fi
 
+#root_path=/data/app/sfa/mengniu_zhuzhen/mobile_webapps
 #find file is webapps/$(*)/sfa.properties 
 sfa_properties=$(find $root_path -type f -name sfa.properties  | grep "WEB-INF/classes/config" )
 echo -e "\033[36m$sfa_properties\033[0m"  | grep $sfa_properties  &>/dev/null
 if [ $? -eq 0 ]
 then
     echo -e "\033[36m$sfa_properties\033[0m"
-    echo -e "\033[32m----  sfa.properties  config  begin---- \033[0m"
     grep "^project="  $sfa_properties
     grep "^mediaPath=" "$sfa_properties"
     grep "^mediaServerUrl=" "$sfa_properties"
@@ -112,7 +112,7 @@ then
     grep "^mongodb.username=" "$sfa_properties"
     grep "^mongodb.password=" "$sfa_properties"
     grep "^mongodb.poolsize=" "$sfa_properties"
-    echo -e "\033[32m----  sfa.properties  config  end---- \033[0m\n"
+    echo -e "\n"
 fi
 
 #find file is webapps/$(*)/jdbc.properties
@@ -121,11 +121,10 @@ echo -e "\033[36m$jdbc_properties\033[0m"   | grep $jdbc_properties  &>/dev/null
 if [ $? -eq 0 ]
 then
     echo -e "\033[36m$jdbc_properties\033[0m"
-    echo -e "\033[32m----  jdbc.properties  config  begin---- \033[0m"
     grep "^jdbc.url=" $jdbc_properties
     grep "^jdbc.username=" $jdbc_properties
     grep "^jdbc.password="  $jdbc_properties
-    echo -e "\033[32m----  jdbc.properties  config  end---- \033[0m\n"
+    echo -e "\n"
 fi
 
 #find file is APP_HOME/$(*)/jdbc.properties
@@ -136,11 +135,10 @@ then
     if [ $? -eq 0 ]
     then
         echo -e "\033[36m$jdbc_properties\033[0m"
-        echo -e "\033[32m----  jdbc.properties  config  begin---- \033[0m"
         grep "^jdbc.url=" $jdbc_properties
         grep "^jdbc.username=" $jdbc_properties
         grep "^jdbc.password="  $jdbc_properties
-        echo -e "\033[32m----  jdbc.properties  config  end---- \033[0m\n"
+        echo -e "\n"
     fi
 fi
 
@@ -150,11 +148,10 @@ echo -e "\033[36m$base_properties\033[0m"   | grep $base_properties &>/dev/null
 if [ $? -eq 0 ]
 then
     echo -e "\033[36m$base_properties\033[0m"
-    echo -e "\033[32m----  base.properties  config  begin---- \033[0m"
     grep "^job.baseJob=" $base_properties
     grep "^server.type.value=" $base_properties
     grep "^security.property.placeholder="  $base_properties
-    echo -e "\033[32m----  base.properties  config  end---- \033[0m\n"
+    echo -e "\n"
 fi
 
 #find file is APP_HOME/$(*)/base.properties
@@ -165,11 +162,10 @@ then
     if [ $? -eq 0 ]
     then
         echo -e "\033[36m$base_properties\033[0m"
-        echo -e "\033[32m----  base.properties  config  begin---- \033[0m"
         grep "^job.baseJob=" $base_properties
         grep "^server.type.value=" $base_properties
         grep "^security.property.placeholder="  $base_properties
-        echo -e "\033[32m----  base.properties  config  end---- \033[0m\n"  
+        echo -e "\n"
     fi
 fi
 }
@@ -191,30 +187,48 @@ fi
 #dump tomcat info
 dump_tomcat(){
 tomcat_status;echo
-read -p "Please enter the pid of the dump target: " PID;echo
+read -p "Please enter the pid of the dump target: " tpid;echo
 
-inputpid=$(tomcat_status | grep $PID) && > /dev/null
-if [ $? -eq 0 ]
+tomcat_status | grep $tpid  > /dev/null
+if [ $? -ne 0 ]
 then
-    echo -e "You input tomcat is : $inputpid\n"
+    echo "input error.. no pid.."
+    continue
+fi
+
+tomcat_path=$(ps -ef| grep $tpid | grep -v grep |grep -v DocumentService-1.2.jar | awk '{print $(NF-3)}' |sed 's/-Dcatalina.home=//g')
+
+java_home=$(grep -E  '^JAVA_HOME|^export JAVA_HOME' $tomcat_path/bin/catalina.sh | cut -d"=" -f 2| sed 's/"//g' |sed 's#/$##')
+if [ -z $java_home ]
+then
+    java_home=$(grep -E  '^JAVA_HOME|^export JAVA_HOME' $tomcat_path/bin/startup.sh | cut -d"=" -f 2| sed 's/"//g' |sed 's#/$##')
+    if [ -z $java_home ]
+    then
+        java_home=$(grep -E '^JAVA_HOME|^export JAVA_HOME' /etc/profile | cut -d"=" -f 2| sed 's/"//g' |sed 's#/$##' )
+    fi
+fi
+
+if [ -d $java_home ]
+then
+    echo -e "You input tomcat is : pid:$tpid, path:$tomcat_path\n"
     read -p "continue? [y|n]" input;echo
     if [ $input = y ]
     then
 	mkdir -p /data/dump/$(date "+%Y-%m-%d")  > /dev/null
-	echo "jmap -heap  $PID  start .."
-	jmap -heap  $PID &> /data/dump/$(date "+%Y-%m-%d")/jmap_heap_$PID.txt   
-	echo -e "Path:/data/dump/$(date "+%Y-%m-%d")/jmap_heap_$PID.txt\njmap -heap  $PID  end.. \n"
-	echo "jmap -histo  $PID  start .."
-	jmap -histo $PID &> /data/dump/$(date "+%Y-%m-%d")/jmap_histo_$PID.txt
-	echo -e "Path:/data/dump/$(date "+%Y-%m-%d")/jmap_histo_$PID.txt\njmap -histo  $PID  end.. \n"
-	echo -e "\njstack -F  $PID  start .."
-	jstack -F  $PID &> /data/dump/$(date "+%Y-%m-%d")/jstack_F_$PID.txt
-	echo -e "Path:/data/dump/$(date "+%Y-%m-%d")/jstack_F_$PID.txt\njstack -F  $PID  end.. \n"
-	echo "jstack -l  $PID  start .."
-	jstack -l $PID &> /data/dump/$(date "+%Y-%m-%d")/jstack_l_$PID.txt
-	echo -e "Path:/data/dump/$(date "+%Y-%m-%d")/jstack_l_$PID.txt\njstack -l  $PID  end.. \n"
-        echo "jmap -dump:format=b  $PID  start .."
-        jmap -F -dump:format=b,file=/data/dump/$(date "+%Y-%m-%d")/jmap_dump_$PID.dump $PID
+	echo "jmap -heap  $tpid  start .."
+	$java_home/bin/jmap -heap  $tpid &> /data/dump/$(date "+%Y-%m-%d")/jmap_heap_$tpid.txt   
+	echo -e "Path:/data/dump/$(date "+%Y-%m-%d")/jmap_heap_$tpid.txt\njmap -heap  $tpid  end.. \n"
+	echo "jmap -histo  $tpid  start .."
+	$java_home/bin/jmap -histo $tpid &> /data/dump/$(date "+%Y-%m-%d")/jmap_histo_$tpid.txt
+	echo -e "Path:/data/dump/$(date "+%Y-%m-%d")/jmap_histo_$tpid.txt\njmap -histo  $tpid  end.. \n"
+	echo -e "\njstack -F  $tpid  start .."
+	$java_home/bin/jstack -F  $tpid &> /data/dump/$(date "+%Y-%m-%d")/jstack_F_$tpid.txt
+	echo -e "Path:/data/dump/$(date "+%Y-%m-%d")/jstack_F_$tpid.txt\njstack -F  $tpid  end.. \n"
+	echo "jstack -l  $tpid  start .."
+	$java_home/bin/jstack -l $tpid &> /data/dump/$(date "+%Y-%m-%d")/jstack_l_$tpid.txt
+	echo -e "Path:/data/dump/$(date "+%Y-%m-%d")/jstack_l_$tpid.txt\njstack -l  $tpid  end.. \n"
+        echo "jmap -dump:format=b  $tpid  start .."
+        $java_home/bin/jmap -F -dump:format=b,file=/data/dump/$(date "+%Y-%m-%d")/jmap_dump_$tpid.dump $tpid
     else
 	continue
     fi
@@ -302,45 +316,27 @@ fi
 }
 
 jvm_ps_old(){
-ps -ef | grep java | grep -Ev "grep|application.properties" | awk '{print $2, $(NF-3)}' |sed 's/-Dcatalina.home=//'  > runing_tomcat.tmp
-
-if [ ! -s runing_tomcat.tmp ]
+tomcat_status;echo
+read -p "Show Jvm ps_old,please input pid:" tpid
+tomcat_status | grep $tpid  > /dev/null
+if [ $? -ne 0 ]
 then
-   echo -e "\n\033[36mNot Runing Tomcat...\033[0m"
-   rm -f runing_tomcat.tmp
-   continue
+    echo "input error.. no pid.."
+    continue
 fi
 
-cat runing_tomcat.tmp  | while read tomcat_pid tomcat_path
-do
-    java_home=$(grep -E  '^JAVA_HOME|^export JAVA_HOME' $tomcat_path/bin/catalina.sh | cut -d"=" -f 2| sed 's/"//g' |sed 's#/$##')
+tomcat_path=$(ps -ef| grep $tpid | grep -v grep |grep -v DocumentService-1.2.jar | awk '{print $(NF-3)}' |sed 's/-Dcatalina.home=//g')
+java_home=$(grep -E  '^JAVA_HOME|^export JAVA_HOME' $tomcat_path/bin/catalina.sh | cut -d"=" -f 2| sed 's/"//g' |sed 's#/$##')
+if [ -z $java_home ]
+then
+    java_home=$(grep -E  '^JAVA_HOME|^export JAVA_HOME' $tomcat_path/bin/startup.sh | cut -d"=" -f 2| sed 's/"//g' |sed 's#/$##')
     if [ -z $java_home ]
     then
-        java_home=$(grep -E  '^JAVA_HOME|^export JAVA_HOME' $tomcat_path/bin/startup.sh | cut -d"=" -f 2| sed 's/"//g' |sed 's#/$##')
-        if [ -z $java_home ]
-        then
-            java_home=$(grep -E '^JAVA_HOME|^export JAVA_HOME' /etc/profile | cut -d"=" -f 2| sed 's/"//g' |sed 's#/$##' )
-        fi
+        java_home=$(grep -E '^JAVA_HOME|^export JAVA_HOME' /etc/profile | cut -d"=" -f 2| sed 's/"//g' |sed 's#/$##' )
     fi
-    java_version=$(echo $java_home |  sed 's#/$##' |awk -F/ '{print $(NF-0)}')
+fi
 
-    if [ $java_version = "jdk1.6.0_31" -o  $java_version = "jdk1.6.0_45"  -o $java_version = "jdk1.7.0_02"  ]
-    then
-        PS_Old=$($java_home/bin/jmap -heap $tomcat_pid | awk '{print $1}'|tail -n 6 | head  -n 1 |sed 's/%//g' )
-    elif [ $java_version = "jdk1.7.0_79" -o $java_version = "jdk1.8.0_25" -o $java_version = "jdk1.8.0_45" ]
-    then
-        PS_Old=$($java_home/bin/jmap -heap $tomcat_pid | grep -A 4 "PS Old Generation" | tail -1 |sed 's/% used//g'|sed 's/   //' )
-    else
-        echo "java_version is not exist!"
-        exit
-    fi
-
-    echo -e "\033[40;36mtomcat-pid:$tomcat_pid   tomcat-path:$tomcat_path  \njdk-path:$java_home   jdk-version:$java_version\033[0m"  
-    echo -e "\033[40;32mPS Old Generation: $PS_Old\033[0m" 
-
-done
-rm -f  runing_tomcat.tmp
-continue
+$java_home/bin/jmap -heap $tpid
 }
 
 
@@ -356,6 +352,13 @@ fi
 }
 
 docker_menu(){
+which  docker &> /dev/null
+if [ $? -ne 0 ]
+then
+    echo "not install docker.. exit docker menu.."
+    break
+fi
+
 echo -e "
 ==========================
 \033[32mDocker Menu:\033[0m
@@ -449,6 +452,10 @@ do
         jvm_ps_old;;
 	d)
 	dump_tomcat;;
+	k)
+	tomcat_status;echo
+	read -p "input kill pid:" killpid
+	kill -9 $killpid;;
         tr)
         restart_tomcat;;
         tf)
