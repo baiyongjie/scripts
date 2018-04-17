@@ -1,7 +1,6 @@
 #!/bin/bash
 ###############################
-###owned by Winchannel ITS ####
-###version 1.2 2018-03-05  ####
+###version 1.3 2018-04-13  ####
 ###created by Baiyongjie   ####
 ###############################
 
